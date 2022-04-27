@@ -107,17 +107,17 @@ class NGram(AddOn):
         df.to_csv("n-gram-data.csv")
 
         # create the zipfile.
-        zipObj = ZipFile("n-gram-graphs.zip", "w")
+        zip_obj = ZipFile("n-gram-graphs.zip", "w")
         # Add multiple files to the zip
-        zipObj.write("n-gram-graph-1.png")
-        zipObj.write("n-gram-graph-2.png")
-        zipObj.write("n-gram-graph-3.png")
-        zipObj.write("n-gram-data.csv")
+        zip_obj.write("n-gram-graph-1.png")
+        zip_obj.write("n-gram-graph-2.png")
+        zip_obj.write("n-gram-graph-3.png")
+        zip_obj.write("n-gram-data.csv")
 
-        if zipObj.testzip() != None:
+        if zip_obj.testzip() != None:
             raise IOError("Something was wrong with the zipfile!")
 
-        zipObj.close()
+        zip_obj.close()
 
         with open("n-gram-graphs.zip", "r") as file_:
             # upload our zipfile.
