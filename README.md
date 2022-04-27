@@ -1,9 +1,11 @@
 
-# DocumentCloud Add-On Example
+# DocumentCloud N-Gram Addon
 
-This repository contains an example Add-On for DocumentCloud.  It is designed
-to be copied and modified to allow one to easily write Add-Ons to bring custom
-functionality to DocumentCloud.
+This repository contains an Add-on for DocumentCloud that creates 
+n-gram graphs of word frequency and a CSV file containing raw data
+that is returned to the user in a zip file.
+
+The add-on takes in two strings from user input. 
 
 ## Files
 
@@ -79,7 +81,11 @@ properly quote your JSON at the command line.
 
 Example invocation:
 ```
-python main.py --documents 123 --data '{"name": "World"}'
+python main.py --documents 123 --data '{"string1": "World", "string2": "cam"}'
+```
+
+```
+python main.py --query "+user:john-doe-111111" --data '{"string1": "World", "string2": "cam"}'
 ```
 
 ### main.py
