@@ -16,7 +16,7 @@ class NGram(AddOn):
 
     def get_str_count(self, word, text):
         """returns count of word/text in doc text"""
-        my_regex = r"" + re.escape(word)
+        my_regex = r"\b" + re.escape(word) + r"\b"
         return len(re.findall(my_regex, text))
 
     def make_df(self, dates, s1_counts, s2_counts):
@@ -27,6 +27,7 @@ class NGram(AddOn):
         )
         df["datetime"] = df["datetime"].astype("datetime64")
         df["date"] = df["datetime"].dt.date
+        df = df.drop(columns=["datetime"])
         df = df.sort_values(by="date")
         return df
 
@@ -35,7 +36,7 @@ class NGram(AddOn):
             y=self.string_1,
             kind="line",
             x="date",
-            title=self.string_1 + "Frequency Over Time",
+            title='"' + self.string_1 + '" ' + ": Frequency Over Time",
             figsize=(12, 8),
         )
 
@@ -46,7 +47,7 @@ class NGram(AddOn):
             y=self.string_2,
             kind="line",
             x="date",
-            title=self.string_2 + "Frequency Over Time",
+            title='"' + self.string_2 + '" ' + ": Frequency Over Time",
             figsize=(12, 8),
         )
 
@@ -56,7 +57,7 @@ class NGram(AddOn):
         lines_3 = df.plot(
             kind="line",
             x="date",
-            title=self.string_1 + " " + self.string_2 + "Uploads Over Time",
+            title=self.string_1 + " and " + self.string_2 + ": Frequency Over Time",
             figsize=(12, 8),
         )
 
