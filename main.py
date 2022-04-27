@@ -11,6 +11,7 @@ from zipfile import ZipFile
 
 
 class NGram(AddOn):
+    # class vars for convenience in helper methods.
     string_1 = ""
     string_2 = ""
 
@@ -19,11 +20,11 @@ class NGram(AddOn):
         my_regex = r"\b" + re.escape(word) + r"\b"
         return len(re.findall(my_regex, text))
 
-    def make_df(self, dates, s1_counts, s2_counts):
+    def make_df(self, dates, s1_counts, s2_counts, names):
         """makes a pandas dataframe with the given lists"""
         df = pd.DataFrame(
-            list(zip(dates, s1_counts, s2_counts)),
-            columns=["datetime", self.string_1, self.string_2],
+            list(zip(dates, names, s1_counts, s2_counts)),
+            columns=["datetime", "Document Title", self.string_1, self.string_2],
         )
         df["datetime"] = df["datetime"].astype("datetime64")
         df["date"] = df["datetime"].dt.date
@@ -32,6 +33,7 @@ class NGram(AddOn):
         return df
 
     def make_graphs(self, df):
+        """Uses pandas inbuilt plotting functionality to create frequency plots"""
         lines_1 = df.plot(
             y=self.string_1,
             kind="line",
@@ -39,7 +41,6 @@ class NGram(AddOn):
             title='"' + self.string_1 + '" ' + ": Frequency Over Time",
             figsize=(12, 8),
         )
-
         fig_1 = lines_1.get_figure()
         fig_1.savefig("n-gram-graph-1.png")
 
@@ -50,7 +51,6 @@ class NGram(AddOn):
             title='"' + self.string_2 + '" ' + ": Frequency Over Time",
             figsize=(12, 8),
         )
-
         fig_2 = lines_2.get_figure()
         fig_2.savefig("n-gram-graph-2.png")
 
@@ -60,7 +60,6 @@ class NGram(AddOn):
             title=self.string_1 + " and " + self.string_2 + ": Frequency Over Time",
             figsize=(12, 8),
         )
-
         fig_3 = lines_3.get_figure()
         fig_3.savefig("n-gram-graph-3.png")
         return
@@ -77,37 +76,51 @@ class NGram(AddOn):
         document_dates = []
         string_1_counts = []
         string_2_counts = []
+        doc_names = []
 
-        # add a hello note to the first page of each selected document
+        def process_doc(document):
+            """helper method to retrieve all relevant data from a document."""
+            document_dates.append(str(document.created_at))
+            doc_text = document.full_text
+            doc_text = doc_text.lower()
+            string_1_counts.append(self.get_str_count(self.string_1, doc_text))
+            string_2_counts.append(self.get_str_count(self.string_2, doc_text))
+            doc_names.append(document.title)
+
+        # process each document in a query or list of documents
         if self.documents:
             for document in self.client.documents.list(id__in=self.documents):
-                document_dates.append(str(document.created_at))
-                doc_text = document.full_text
-                doc_text = doc_text.lower()
-                string_1_counts.append(self.get_str_count(self.string_1, doc_text))
-                string_2_counts.append(self.get_str_count(self.string_2, doc_text))
+                process_doc(document)
 
         elif self.query:
             documents = self.client.documents.search(self.query)
             for document in documents:
-                document_dates.append(str(document.created_at))
-                doc_text = document.full_text
-                doc_text = doc_text.lower()
-                string_1_counts.append(self.get_str_count(self.string_1, doc_text))
-                string_2_counts.append(self.get_str_count(self.string_2, doc_text))
+                process_doc(document)
 
-        df = self.make_df(document_dates, string_1_counts, string_2_counts)
+        # create the pandas dataframe and sort by date.
+        df = self.make_df(document_dates, string_1_counts, string_2_counts, doc_names)
 
+        # create 3 different graphs.
         self.make_graphs(df)
 
+        # save a csv.
+        df.to_csv("n-gram-data.csv")
+
+        # create the zipfile.
         zipObj = ZipFile("n-gram-graphs.zip", "w")
         # Add multiple files to the zip
         zipObj.write("n-gram-graph-1.png")
         zipObj.write("n-gram-graph-2.png")
         zipObj.write("n-gram-graph-3.png")
+        zipObj.write("n-gram-data.csv")
+
+        if zipObj.testzip() != None:
+            raise IOError("Something was wrong with the zipfile!")
+
         zipObj.close()
 
-        with open("n-gram-graphs.zip", "w+") as file_:
+        with open("n-gram-graphs.zip", "r") as file_:
+            # upload our zipfile.
             self.upload_file(file_)
 
         self.set_message("N-gram Graphs end!")
