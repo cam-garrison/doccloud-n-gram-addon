@@ -1,7 +1,7 @@
 # The title is the title of your Add-On
-title: Hello World
+title: N-Gram Graphs
 # The description will be shown above the form when activating the Add-On
-description: This is an updated simple test add-on
+description: This add-on will create word frequency graphs over time. 
 # Type should always be object
 type: object
 # How does this add-on accept documents
@@ -14,9 +14,14 @@ documents:
 # Properties are the fields for your form
 properties:
   # the key is the name of the variable that will be returned to your code
-  name:
+  string1:
     # the title is what will be shown as the form label
-    title: Name
+    title: Word 1
+    # a string is text
+    type: string
+  string2:
+    # the title is what will be shown as the form label
+    title: Word 2
     # a string is text
     type: string
 
