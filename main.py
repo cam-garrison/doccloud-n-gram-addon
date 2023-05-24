@@ -26,7 +26,7 @@ class NGram(AddOn):
             list(zip(dates, names, s1_counts, s2_counts)),
             columns=["datetime", "Document Title", self.string_1, self.string_2],
         )
-        df["datetime"] = df["datetime"].astype("datetime64")
+        df["datetime"] = pd.to_datetime(df["datetime"]).dt.tz_localize(None)
         df["date"] = df["datetime"].dt.date
         df = df.drop(columns=["datetime"])
         df = df.sort_values(by="date")
