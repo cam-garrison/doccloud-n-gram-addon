@@ -24,5 +24,6 @@ properties:
     title: Word 2
     # a string is text
     type: string
-
+categories:
+  - statistical
 
