@@ -3,6 +3,7 @@ title: N-Gram Graphs
 # The description will be shown above the form when activating the Add-On
 description: This add-on will create word frequency graphs over time. 
 # Type should always be object
+instructions: ''
 type: object
 # How does this add-on accept documents
 # If more than one type is specified, the user will be prompted to choose one
